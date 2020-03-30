@@ -39,7 +39,7 @@ public class TransactionController {
     }
 
     @GetMapping("/transactions")
-    public List<FinancialTransaction> getAllTransactions() {
+    List<FinancialTransaction> getAllTransactions() {
 
         return financialTransactionList;
     }
@@ -49,6 +49,6 @@ public class TransactionController {
         FinancialTransaction financialTransaction = financialTransactionList.get(transactionId - 1);
 
         return financialTransaction;
-        }
+    }
 }
 
