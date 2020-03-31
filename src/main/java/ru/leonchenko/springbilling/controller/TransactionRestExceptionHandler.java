@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
  */
 
 @ControllerAdvice
-public class TransactionRestExceptionHandler{
+class TransactionRestExceptionHandler{
 
     @ExceptionHandler
-    public ResponseEntity<TransactionExceptionResponse> handleException(Exception e) {
+    private ResponseEntity<TransactionExceptionResponse> handleException(Exception e) {
 
         TransactionExceptionResponse customerErrorResponse = new TransactionExceptionResponse(HttpStatus.BAD_REQUEST.value(),
                 e.getMessage(),

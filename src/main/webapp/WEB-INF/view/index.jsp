@@ -14,11 +14,11 @@
     TEST INDEX PAGE!
 </h1>
 <hr>
-    <a href="test/transactions">Transaction List!</a>
+    <a href="api/transactions">Transaction List!</a>
 <hr>
-    <a href="test/transactions/1">Get transaction by id = 1!</a><br>
-    <a href="test/transactions/2">Get transaction by id = 2!</a><br>
-    <a href="test/transactions/3">Get transaction by id = 3!</a><br>
+    <a href="api/transactions/1">Get transaction by id = 1!</a><br>
+    <a href="api/transactions/2">Get transaction by id = 2!</a><br>
+    <a href="api/transactions/3">Get transaction by id = 3!</a><br>
 <hr>
 </body>
 </html>
