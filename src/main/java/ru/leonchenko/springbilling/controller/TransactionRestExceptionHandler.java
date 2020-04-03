@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 class TransactionRestExceptionHandler{
 
     @ExceptionHandler
-    private ResponseEntity<TransactionExceptionResponse> handleException(Exception e) {
+    public ResponseEntity<TransactionExceptionResponse> handleException(Exception e) {
 
         TransactionExceptionResponse customerErrorResponse = new TransactionExceptionResponse(HttpStatus.BAD_REQUEST.value(),
                 e.getMessage(),
