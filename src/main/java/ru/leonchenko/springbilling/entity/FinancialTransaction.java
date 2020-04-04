@@ -15,7 +15,6 @@ public class FinancialTransaction {
 
     private Long amount;
 
-
     public Integer getId() {
         return id;
     }

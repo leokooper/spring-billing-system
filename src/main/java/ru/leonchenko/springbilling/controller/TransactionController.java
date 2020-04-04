@@ -1,17 +1,20 @@
 package ru.leonchenko.springbilling.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+
+import ru.leonchenko.springbilling.billing.BillingAPI;
+import ru.leonchenko.springbilling.billing.TransactionStatus;
 import ru.leonchenko.springbilling.entity.FinancialTransaction;
 
-import java.io.File;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,24 +22,14 @@ import java.util.List;
  * @version 1.0
  */
 
-
-//@Controller
 @RestController
-@RequestMapping(value = "/test", method = RequestMethod.GET)
+@RequestMapping(value = "/api")
 public class TransactionController {
 
-    File file = new File("/Users/leokooper/git/spring-billing-system/json/sample.json");
-    ObjectMapper objectMapper = new ObjectMapper();
-    TypeFactory typeFactory = objectMapper.getTypeFactory();
-    List<FinancialTransaction> financialTransactionList;
+    @Autowired
+    private BillingAPI billingAPI;
 
-    {
-        try {
-            financialTransactionList = objectMapper.readValue(file, typeFactory.constructCollectionType(List.class, FinancialTransaction.class));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    private List<FinancialTransaction> financialTransactionList = new ArrayList<>();
 
     @GetMapping("/transactions")
     public List<FinancialTransaction> getAllTransactions() {
@@ -46,9 +39,33 @@ public class TransactionController {
 
     @GetMapping("/transactions/{transactionId}")
     public FinancialTransaction getTransactionById(@PathVariable int transactionId) {
-        FinancialTransaction financialTransaction = financialTransactionList.get(transactionId - 1);
 
-        return financialTransaction;
+        return financialTransactionList.get(transactionId - 1);
+    }
+
+    @PostMapping("/transaction")
+    public @ResponseBody FinancialTransaction addTransaction(@RequestBody FinancialTransaction financialTransaction) {
+
+        if(billingAPI.send(financialTransaction).equals(TransactionStatus.OK)){
+            financialTransactionList.add(financialTransaction);
+            return financialTransaction;
+        } else {
+            throw new IllegalArgumentException();
         }
+    }
+
+    @PostMapping("/transactions")
+    public @ResponseBody List<FinancialTransaction> addTransactionArray(@RequestBody List<FinancialTransaction> financialTransactions) {
+
+        for (FinancialTransaction financialTransaction : financialTransactions) {
+            if (billingAPI.send(financialTransaction).equals(TransactionStatus.OK)) {
+                financialTransactionList.add(financialTransaction);
+        } else {
+                throw new IllegalArgumentException();
+            }
+        }
+
+        return financialTransactionList;
+    }
 }
 
