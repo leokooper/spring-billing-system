@@ -12,15 +12,10 @@ import ru.leonchenko.springbilling.entity.FinancialTransaction;
 class BillingAPIImpl implements BillingAPI {
 
     @Override
-    public TransactionStatus send(FinancialTransaction financialTransaction) {
+    public boolean send(FinancialTransaction financialTransaction) {
 
-        if ((financialTransaction.getId() > 0)
-                && (!financialTransaction.getSrcId().equals(financialTransaction.getDstId()))
-                && (financialTransaction.getAmount() > 0)) {
-            return TransactionStatus.OK;
-        } else {
-            return TransactionStatus.FALSE;
-        }
+        return new TransactionValidation().validation(financialTransaction);
+
     }
-
 }
+

@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 
 import ru.leonchenko.springbilling.billing.BillingAPI;
-import ru.leonchenko.springbilling.billing.TransactionStatus;
 import ru.leonchenko.springbilling.entity.FinancialTransaction;
 
 import java.util.ArrayList;
@@ -31,6 +30,8 @@ public class TransactionController {
 
     private List<FinancialTransaction> financialTransactionList = new ArrayList<>();
 
+    private boolean isTransactionSucceed;
+
     @GetMapping("/transactions")
     public List<FinancialTransaction> getAllTransactions() {
 
@@ -44,24 +45,33 @@ public class TransactionController {
     }
 
     @PostMapping("/transaction")
-    public @ResponseBody FinancialTransaction addTransaction(@RequestBody FinancialTransaction financialTransaction) {
+    public @ResponseBody
+    FinancialTransaction addTransaction(@RequestBody FinancialTransaction financialTransaction) {
 
-        if(billingAPI.send(financialTransaction).equals(TransactionStatus.OK)){
+        isTransactionSucceed = billingAPI.send(financialTransaction);
+
+        if (isTransactionSucceed) {
             financialTransactionList.add(financialTransaction);
             return financialTransaction;
         } else {
-            throw new IllegalArgumentException();
+            //TODO null just a stub for return statement, rewrite it later;
+            return null;
         }
     }
 
     @PostMapping("/transactions")
-    public @ResponseBody List<FinancialTransaction> addTransactionArray(@RequestBody List<FinancialTransaction> financialTransactions) {
+    public @ResponseBody
+    List<FinancialTransaction> addTransactionArray(@RequestBody List<FinancialTransaction> financialTransactions) {
 
         for (FinancialTransaction financialTransaction : financialTransactions) {
-            if (billingAPI.send(financialTransaction).equals(TransactionStatus.OK)) {
+
+            isTransactionSucceed = billingAPI.send(financialTransaction);
+
+            if (isTransactionSucceed) {
                 financialTransactionList.add(financialTransaction);
-        } else {
-                throw new IllegalArgumentException();
+            } else {
+                //TODO null just a stub for return statement, rewrite it later;
+                return null;
             }
         }
 
