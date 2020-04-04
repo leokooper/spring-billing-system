@@ -24,3 +24,6 @@ hs_err_pid*
 
 # Ignore .DS_Store file
 .DS_Store
+
+#Ignore Idea files
+.idea/
