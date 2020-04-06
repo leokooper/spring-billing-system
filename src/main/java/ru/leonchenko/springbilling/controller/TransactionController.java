@@ -50,13 +50,9 @@ public class TransactionController {
 
         isTransactionSucceed = billingAPI.send(financialTransaction);
 
-        if (isTransactionSucceed) {
+        if (isTransactionSucceed)
             financialTransactionList.add(financialTransaction);
-            return financialTransaction;
-        } else {
-            //TODO null just a stub for return statement, rewrite it later;
-            return null;
-        }
+        return financialTransaction;
     }
 
     @PostMapping("/transactions")
@@ -67,14 +63,9 @@ public class TransactionController {
 
             isTransactionSucceed = billingAPI.send(financialTransaction);
 
-            if (isTransactionSucceed) {
+            if (isTransactionSucceed)
                 financialTransactionList.add(financialTransaction);
-            } else {
-                //TODO null just a stub for return statement, rewrite it later;
-                return null;
-            }
         }
-
         return financialTransactionList;
     }
 }
