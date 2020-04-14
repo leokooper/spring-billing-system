@@ -11,10 +11,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 
 import ru.leonchenko.springbilling.billing.BillingAPI;
+import ru.leonchenko.springbilling.billing.TransactionProvider;
 import ru.leonchenko.springbilling.entity.FinancialTransaction;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.*;
 
 /**
  * @author Igor Leonchenko
@@ -28,20 +30,26 @@ public class TransactionController {
     @Autowired
     private BillingAPI billingAPI;
 
-    private List<FinancialTransaction> financialTransactionList = new ArrayList<>();
+    @Autowired
+    private TransactionProvider transactionProvider;
+
+    private BlockingQueue<FinancialTransaction> financialTransactionList = new LinkedBlockingQueue<>(50);
+
+    private List<FinancialTransaction> financialTransactionDB = new ArrayList<>();
 
     private boolean isTransactionSucceed;
 
+
     @GetMapping("/transactions")
     public List<FinancialTransaction> getAllTransactions() {
-
-        return financialTransactionList;
+        transactionProvider.drainToDB(financialTransactionList, financialTransactionDB);
+        return financialTransactionDB;
     }
 
     @GetMapping("/transactions/{transactionId}")
     public FinancialTransaction getTransactionById(@PathVariable int transactionId) {
 
-        return financialTransactionList.get(transactionId - 1);
+        return financialTransactionDB.get(transactionId - 1);
     }
 
     @PostMapping("/transaction")
@@ -50,21 +58,23 @@ public class TransactionController {
 
         isTransactionSucceed = billingAPI.send(financialTransaction);
 
-        if (isTransactionSucceed)
+        if (isTransactionSucceed) {
             financialTransactionList.add(financialTransaction);
+        }
         return financialTransaction;
     }
 
     @PostMapping("/transactions")
     public @ResponseBody
-    List<FinancialTransaction> addTransactionArray(@RequestBody List<FinancialTransaction> financialTransactions) {
+    BlockingQueue<FinancialTransaction> addTransactionArray(@RequestBody List<FinancialTransaction> financialTransactions) {
 
         for (FinancialTransaction financialTransaction : financialTransactions) {
 
             isTransactionSucceed = billingAPI.send(financialTransaction);
 
-            if (isTransactionSucceed)
+            if (isTransactionSucceed) {
                 financialTransactionList.add(financialTransaction);
+            }
         }
         return financialTransactionList;
     }
