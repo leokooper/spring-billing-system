@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 
 import ru.leonchenko.springbilling.billing.BillingAPI;
-import ru.leonchenko.springbilling.billing.TransactionProvider;
+import ru.leonchenko.springbilling.billing.LoggerContainer;
+import ru.leonchenko.springbilling.billing.LoggerContainerImpl;
 import ru.leonchenko.springbilling.entity.FinancialTransaction;
 
 import java.util.ArrayList;
@@ -30,19 +31,20 @@ public class TransactionController {
     @Autowired
     private BillingAPI billingAPI;
 
-    @Autowired
-    private TransactionProvider transactionProvider;
-
-    private BlockingQueue<FinancialTransaction> financialTransactionList = new LinkedBlockingQueue<>(50);
+//    @Autowired
+//    private LoggerContainer loggerContainer;
 
     private List<FinancialTransaction> financialTransactionDB = new ArrayList<>();
 
-    private boolean isTransactionSucceed;
+    LoggerContainer loggerContainer = new LoggerContainerImpl(financialTransactionDB);
 
+    ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+
+    private boolean isTransactionSucceed;
 
     @GetMapping("/transactions")
     public List<FinancialTransaction> getAllTransactions() {
-        transactionProvider.drainToDB(financialTransactionList, financialTransactionDB);
+        executorService.schedule((Runnable) loggerContainer, 5, TimeUnit.SECONDS);
         return financialTransactionDB;
     }
 
@@ -59,24 +61,24 @@ public class TransactionController {
         isTransactionSucceed = billingAPI.send(financialTransaction);
 
         if (isTransactionSucceed) {
-            financialTransactionList.add(financialTransaction);
+            loggerContainer.push(financialTransaction);
         }
         return financialTransaction;
     }
 
     @PostMapping("/transactions")
     public @ResponseBody
-    BlockingQueue<FinancialTransaction> addTransactionArray(@RequestBody List<FinancialTransaction> financialTransactions) {
+    List<FinancialTransaction> addTransactionArray(@RequestBody List<FinancialTransaction> financialTransactions) {
 
         for (FinancialTransaction financialTransaction : financialTransactions) {
 
             isTransactionSucceed = billingAPI.send(financialTransaction);
 
             if (isTransactionSucceed) {
-                financialTransactionList.add(financialTransaction);
+                loggerContainer.push(financialTransaction);
             }
         }
-        return financialTransactionList;
+        return financialTransactionDB;
     }
 }
 

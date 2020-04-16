@@ -1,8 +1,11 @@
 package ru.leonchenko.springbilling.billing;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.leonchenko.springbilling.entity.FinancialTransaction;
 
-import java.util.logging.Logger;
+
 
 /**
  * @author Igor Leonchenko
@@ -11,26 +14,23 @@ import java.util.logging.Logger;
 
 public class TransactionValidation {
 
-    private static Logger log = Logger.getLogger(TransactionValidation.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(TransactionValidation.class);
 
     public static boolean validation(FinancialTransaction financialTransaction) {
 
-        if (financialTransaction.getId() > 0) {
-            log.info("Id is valid");
-        } else {
-            throw new IllegalArgumentException("Id is not valid");
+        if (financialTransaction.getId() <= 0) {
+            logger.error("Financial transaction id " + financialTransaction.getId() + " isn't valid");
+            throw new IllegalArgumentException();
         }
 
-        if (!financialTransaction.getSrcId().equals(financialTransaction.getDstId())) {
-            log.info("Source and destination are valid");
-        } else {
-            throw new IllegalArgumentException("Source and destination are not valid");
+        if (financialTransaction.getSrcId().equals(financialTransaction.getDstId())) {
+            logger.error("In transaction Id " + financialTransaction.getId() + " src and dst are equals");
+            throw new IllegalArgumentException();
         }
 
-        if (financialTransaction.getAmount() > 0) {
-            log.info("Amount is valid");
-        } else {
-            throw new IllegalArgumentException("Amount is not valid");
+        if (financialTransaction.getAmount() <= 0) {
+            logger.error("In transaction Id " + financialTransaction.getId() + " financial transactions isn't valid");
+            throw new IllegalArgumentException();
         }
 
         return true;
