@@ -1,11 +1,17 @@
 package ru.leonchenko.springbilling.billing;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import ru.leonchenko.springbilling.entity.FinancialTransaction;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -14,23 +20,32 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 
 @Component
-public class LoggerContainerImpl implements Runnable, LoggerContainer {
+public class LoggerContainerImpl implements LoggerContainer {
 
-    private List<FinancialTransaction> financialTransactions;
+    private static Logger logger = LoggerFactory.getLogger(TransactionValidation.class);
 
-    public LoggerContainerImpl(List<FinancialTransaction> financialTransactions) {
-        this.financialTransactions = financialTransactions;
+    ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+
+    private List<FinancialTransaction> financialTransactionDB = new ArrayList<>();
+
+    private BlockingQueue<FinancialTransaction> financialTransactionBQ = new LinkedBlockingQueue<>();
+
+    public LoggerContainerImpl(){
+        Runnable runnable = () -> {
+            financialTransactionBQ.drainTo(financialTransactionDB);
+            logger.debug("Collection drained!");
+        };
+
+        executorService.scheduleAtFixedRate(runnable, 0, 5, TimeUnit.SECONDS);
     }
-
-    private BlockingQueue<FinancialTransaction> financialTransactionList = new LinkedBlockingQueue<>();
 
     public void push(FinancialTransaction financialTransaction) {
-        financialTransactionList.add(financialTransaction);
+        financialTransactionBQ.add(financialTransaction);
     }
 
-    @Override
-    public void run() {
-        financialTransactionList.drainTo(financialTransactions);
+    public List<FinancialTransaction> getFinancialTransactionDB() {
+        return financialTransactionDB;
     }
+
 }
 
