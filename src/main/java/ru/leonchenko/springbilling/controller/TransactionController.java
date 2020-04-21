@@ -26,8 +26,6 @@ public class TransactionController {
 
     private LoggerContainer loggerContainer;
 
-    private boolean isTransactionSucceed;
-
     @Autowired
     public TransactionController(BillingAPI billingAPI, LoggerContainer loggerContainer) {
         this.billingAPI = billingAPI;

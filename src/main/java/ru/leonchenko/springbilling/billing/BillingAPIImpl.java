@@ -12,8 +12,6 @@ import ru.leonchenko.springbilling.entity.FinancialTransaction;
 @Component
 class BillingAPIImpl implements BillingAPI {
 
-    private boolean isTransactionSucceed;
-
     private LoggerContainer loggerContainer;
 
     @Autowired
@@ -24,7 +22,7 @@ class BillingAPIImpl implements BillingAPI {
     @Override
     public void send(FinancialTransaction financialTransaction) {
 
-        if (isTransactionSucceed = TransactionValidation.validation(financialTransaction)) {
+        if (TransactionValidation.validation(financialTransaction)) {
             loggerContainer.push(financialTransaction);
         }
     }
