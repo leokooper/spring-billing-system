@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import ru.leonchenko.springbilling.entity.FinancialTransaction;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -24,18 +26,18 @@ public class LoggerContainerImpl implements LoggerContainer {
 
     private static Logger logger = LoggerFactory.getLogger(TransactionValidation.class);
 
-    ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
     private List<FinancialTransaction> financialTransactionDB = new ArrayList<>();
 
     private BlockingQueue<FinancialTransaction> financialTransactionBQ = new LinkedBlockingQueue<>();
 
-    public LoggerContainerImpl(){
+    @PostConstruct
+    public void init() {
         Runnable runnable = () -> {
             financialTransactionBQ.drainTo(financialTransactionDB);
             logger.debug("Collection drained!");
         };
-
         executorService.scheduleAtFixedRate(runnable, 0, 5, TimeUnit.SECONDS);
     }
 
@@ -47,5 +49,9 @@ public class LoggerContainerImpl implements LoggerContainer {
         return financialTransactionDB;
     }
 
+    @PreDestroy
+    public void shutdown() {
+        executorService.shutdown();
+    }
 }
 

@@ -14,8 +14,12 @@ class BillingAPIImpl implements BillingAPI {
 
     private boolean isTransactionSucceed;
 
-    @Autowired
     private LoggerContainer loggerContainer;
+
+    @Autowired
+    public BillingAPIImpl(LoggerContainer loggerContainer) {
+        this.loggerContainer = loggerContainer;
+    }
 
     @Override
     public void send(FinancialTransaction financialTransaction) {

@@ -22,13 +22,17 @@ import java.util.List;
 @RequestMapping(value = "/api")
 public class TransactionController {
 
-    @Autowired
     private BillingAPI billingAPI;
 
-    @Autowired
     private LoggerContainer loggerContainer;
 
     private boolean isTransactionSucceed;
+
+    @Autowired
+    public TransactionController(BillingAPI billingAPI, LoggerContainer loggerContainer) {
+        this.billingAPI = billingAPI;
+        this.loggerContainer = loggerContainer;
+    }
 
     @GetMapping("/transactions")
     public List<FinancialTransaction> getAllTransactions() {
