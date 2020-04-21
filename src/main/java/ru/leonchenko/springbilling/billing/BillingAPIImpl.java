@@ -22,9 +22,9 @@ class BillingAPIImpl implements BillingAPI {
     @Override
     public void send(FinancialTransaction financialTransaction) {
 
-        if (TransactionValidation.validation(financialTransaction)) {
+            TransactionValidation.validation(financialTransaction);
             loggerContainer.push(financialTransaction);
-        }
+
     }
 
 }

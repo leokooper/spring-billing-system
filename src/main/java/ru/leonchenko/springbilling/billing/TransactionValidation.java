@@ -13,7 +13,7 @@ public class TransactionValidation {
 
     private static Logger logger = LoggerFactory.getLogger(TransactionValidation.class);
 
-    public static boolean validation(FinancialTransaction financialTransaction) {
+        public static void validation(FinancialTransaction financialTransaction) {
 
         if (financialTransaction.getId() <= 0) {
             logger.error("Financial transaction id " + financialTransaction.getId() + " isn't valid");
@@ -26,10 +26,9 @@ public class TransactionValidation {
         }
 
         if (financialTransaction.getAmount() <= 0) {
-            logger.error("In transaction Id " + financialTransaction.getId() + " financial transactions isn't valid");
-            throw new IllegalArgumentException("In transaction Id " + financialTransaction.getId() + " financial transactions isn't valid");
+            logger.error("In transaction Id " + financialTransaction.getId() + " amount isn't valid");
+            throw new IllegalArgumentException("In transaction Id " + financialTransaction.getId() + " amount isn't valid");
         }
 
-        return true;
     }
 }
