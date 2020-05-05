@@ -13,11 +13,21 @@ public class TransactionValidation {
 
     private static Logger logger = LoggerFactory.getLogger(TransactionValidation.class);
 
-        public static void validation(FinancialTransaction financialTransaction) {
+    public static void validation(FinancialTransaction financialTransaction) {
 
         if (financialTransaction.getId() <= 0) {
             logger.error("Financial transaction id " + financialTransaction.getId() + " isn't valid");
             throw new IllegalArgumentException("Financial transaction id " + financialTransaction.getId() + " isn't valid");
+        }
+
+        if (financialTransaction.getSrcId() <= 0) {
+            logger.error("Source transaction id " + financialTransaction.getSrcId() + " can't be negative");
+            throw new IllegalArgumentException("Source id " + financialTransaction.getSrcId() + " can't be negative");
+        }
+
+        if (financialTransaction.getDstId() <= 0) {
+            logger.error("Destination transaction id " + financialTransaction.getDstId() + " can't be negative");
+            throw new IllegalArgumentException("Source id " + financialTransaction.getDstId() + " can't be negative");
         }
 
         if (financialTransaction.getSrcId().equals(financialTransaction.getDstId())) {
