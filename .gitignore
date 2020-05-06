@@ -22,8 +22,13 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-# Ignore .DS_Store file
+# Cruft
+npm-debug.log
 .DS_Store
-
-#Ignore Idea files
 .idea/
+
+# yarn, npm, iml, log
+yarn.lock
+.vscode
+*.iml
+*.log

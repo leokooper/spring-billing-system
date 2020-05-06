@@ -8,12 +8,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-
 import ru.leonchenko.springbilling.billing.BillingAPI;
+import ru.leonchenko.springbilling.billing.LoggerContainer;
 import ru.leonchenko.springbilling.entity.FinancialTransaction;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,33 +22,34 @@ import java.util.List;
 @RequestMapping(value = "/api")
 public class TransactionController {
 
-    @Autowired
     private BillingAPI billingAPI;
 
-    private List<FinancialTransaction> financialTransactionList = new ArrayList<>();
+    private LoggerContainer loggerContainer;
 
-    private boolean isTransactionSucceed;
+    @Autowired
+    public TransactionController(BillingAPI billingAPI, LoggerContainer loggerContainer) {
+        this.billingAPI = billingAPI;
+        this.loggerContainer = loggerContainer;
+    }
 
     @GetMapping("/transactions")
     public List<FinancialTransaction> getAllTransactions() {
 
-        return financialTransactionList;
+        return loggerContainer.getFinancialTransactionDB();
     }
 
     @GetMapping("/transactions/{transactionId}")
     public FinancialTransaction getTransactionById(@PathVariable int transactionId) {
 
-        return financialTransactionList.get(transactionId - 1);
+        return loggerContainer.getFinancialTransactionDB().get(transactionId - 1);
     }
 
     @PostMapping("/transaction")
     public @ResponseBody
     FinancialTransaction addTransaction(@RequestBody FinancialTransaction financialTransaction) {
 
-        isTransactionSucceed = billingAPI.send(financialTransaction);
+        billingAPI.send(financialTransaction);
 
-        if (isTransactionSucceed)
-            financialTransactionList.add(financialTransaction);
         return financialTransaction;
     }
 
@@ -61,12 +59,10 @@ public class TransactionController {
 
         for (FinancialTransaction financialTransaction : financialTransactions) {
 
-            isTransactionSucceed = billingAPI.send(financialTransaction);
-
-            if (isTransactionSucceed)
-                financialTransactionList.add(financialTransaction);
+            billingAPI.send(financialTransaction);
         }
-        return financialTransactionList;
+
+        return loggerContainer.getFinancialTransactionDB();
     }
 }
 

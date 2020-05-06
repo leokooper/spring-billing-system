@@ -8,5 +8,5 @@ import ru.leonchenko.springbilling.entity.FinancialTransaction;
  */
 
 public interface BillingAPI {
-    boolean send(FinancialTransaction financialTransaction);
+    void send(FinancialTransaction financialTransaction);
 }

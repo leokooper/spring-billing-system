@@ -1,5 +1,6 @@
 package ru.leonchenko.springbilling.billing;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.leonchenko.springbilling.entity.FinancialTransaction;
 
@@ -11,11 +12,20 @@ import ru.leonchenko.springbilling.entity.FinancialTransaction;
 @Component
 class BillingAPIImpl implements BillingAPI {
 
-    @Override
-    public boolean send(FinancialTransaction financialTransaction) {
+    private LoggerContainer loggerContainer;
 
-        return new TransactionValidation().validation(financialTransaction);
+    @Autowired
+    public BillingAPIImpl(LoggerContainer loggerContainer) {
+        this.loggerContainer = loggerContainer;
+    }
+
+    @Override
+    public void send(FinancialTransaction financialTransaction) {
+
+            TransactionValidation.validation(financialTransaction);
+            loggerContainer.push(financialTransaction);
 
     }
+
 }
 
