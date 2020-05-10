@@ -4,14 +4,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import ru.leonchenko.springbilling.entity.FinancialTransaction;
+import ru.leonchenko.springbilling.entity.MergedFinancialTransaction;
 import ru.leonchenko.springbilling.utility.TransactionMerger;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -29,11 +28,11 @@ public class LoggerContainerImpl implements LoggerContainer {
 
     private static Logger logger = LoggerFactory.getLogger(TransactionValidation.class);
 
-    private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(2);
+    private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
     private List<FinancialTransaction> financialTransactionDB = new ArrayList<>();
 
-    private Map<String, Long> financialTransactionMap = new HashMap<>();
+    private List<MergedFinancialTransaction> mergedFinancialTransactionTempList = new ArrayList<>();
 
     private BlockingQueue<FinancialTransaction> financialTransactionBQ = new LinkedBlockingQueue<>();
 
@@ -41,9 +40,9 @@ public class LoggerContainerImpl implements LoggerContainer {
     public void drainToArray() {
         Runnable runnable = () -> {
             financialTransactionBQ.drainTo(financialTransactionDB);
-            TransactionMerger.mergeTransactions(financialTransactionDB, financialTransactionMap);
-            System.out.println(financialTransactionMap);
             logger.debug("Collection drained!");
+            mergedFinancialTransactionTempList.addAll(TransactionMerger.mergeTransactions(financialTransactionDB));
+            System.out.println(mergedFinancialTransactionTempList);
         };
         executorService.scheduleAtFixedRate(runnable, 0, 5, TimeUnit.SECONDS);
     }
