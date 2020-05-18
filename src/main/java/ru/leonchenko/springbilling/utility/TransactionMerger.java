@@ -1,13 +1,10 @@
 package ru.leonchenko.springbilling.utility;
 
 import ru.leonchenko.springbilling.entity.FinancialTransaction;
-import ru.leonchenko.springbilling.entity.MergedFinancialTransaction;
 
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author Igor Leonchenko
@@ -16,27 +13,27 @@ import java.util.stream.Collectors;
 
 public class TransactionMerger {
 
-    public static List<MergedFinancialTransaction> mergeTransactions(List<FinancialTransaction> financialTransactions) {
+    public static Map<String, FinancialTransaction> mergeTransactions(List<FinancialTransaction> financialTransactions) {
 
-        Map<String, Long> mergedTransactions = new HashMap<>();
+        Map<String, FinancialTransaction> mergedTransactions = new HashMap<>();
 
         for (FinancialTransaction ft: financialTransactions) {
 
-            String key = ft.getSrcId() + "" + ft.getDstId();
+            String key = ft.getSrcId() + "/" + ft.getDstId();
 
-            Long value = ft.getAmount();
-
-            mergedTransactions.merge(key, value, Long::sum);
-
+            if (mergedTransactions.containsKey(key)) {
+                mergedTransactions.get(key).setAmount(mergedTransactions.get(key).getAmount() + ft.getAmount());
+            } else {
+                FinancialTransaction financialTransaction = new FinancialTransaction();
+                financialTransaction.setSrcId(ft.getSrcId());
+                financialTransaction.setDstId(ft.getDstId());
+                financialTransaction.setAmount(ft.getAmount());
+                mergedTransactions.put(key, financialTransaction);
+            }
         }
 
         financialTransactions.clear();
-
-        return mergedTransactions.entrySet()
-                            .stream()
-                            .map(e ->
-                            new MergedFinancialTransaction(e.getKey(), e.getValue()))
-                            .collect(Collectors.toList());
-
+        return mergedTransactions;
     }
+
 }

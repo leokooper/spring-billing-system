@@ -66,4 +66,5 @@ public class FinancialTransaction {
                 ", ammount=" + amount +
                 '}';
     }
+
 }
