@@ -2,6 +2,8 @@ package ru.leonchenko.springbilling.utility;
 
 import ru.leonchenko.springbilling.entity.FinancialTransaction;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +15,12 @@ import java.util.Map;
 
 public class TransactionMerger {
 
-    public static Map<String, FinancialTransaction> mergeTransactions(List<FinancialTransaction> financialTransactions) {
+    public static FinancialTransaction merge(FinancialTransaction first, FinancialTransaction second){
+        first.setAmount(first.getAmount() + second.getAmount());
+        return first;
+    }
+
+    public static Collection<FinancialTransaction> mergeTransactions(List<FinancialTransaction> financialTransactions) {
 
         Map<String, FinancialTransaction> mergedTransactions = new HashMap<>();
 
@@ -22,7 +29,7 @@ public class TransactionMerger {
             String key = ft.getSrcId() + "/" + ft.getDstId();
 
             if (mergedTransactions.containsKey(key)) {
-                mergedTransactions.get(key).setAmount(mergedTransactions.get(key).getAmount() + ft.getAmount());
+                TransactionMerger.merge(mergedTransactions.get(key), ft);
             } else {
                 FinancialTransaction financialTransaction = new FinancialTransaction();
                 financialTransaction.setSrcId(ft.getSrcId());
@@ -33,7 +40,7 @@ public class TransactionMerger {
         }
 
         financialTransactions.clear();
-        return mergedTransactions;
+        return mergedTransactions.values();
     }
 
 }

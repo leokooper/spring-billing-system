@@ -41,7 +41,7 @@ public class LoggerContainerImpl implements LoggerContainer {
             financialTransactionBQ.drainTo(financialTransactionDB);
             System.out.println("Financial transaction: " + financialTransactionDB);
             logger.debug("Collection drained!");
-            mergedFinancialTransactionTempList.addAll(TransactionMerger.mergeTransactions(financialTransactionDB).values());
+            mergedFinancialTransactionTempList.addAll(TransactionMerger.mergeTransactions(financialTransactionDB));
             System.out.println("Merged DFTTemp: " + mergedFinancialTransactionTempList);
         };
         executorService.scheduleAtFixedRate(runnable, 0, 5, TimeUnit.SECONDS);
