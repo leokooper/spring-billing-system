@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import ru.leonchenko.springbilling.entity.FinancialTransaction;
+import ru.leonchenko.springbilling.utility.TransactionMerger;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -30,13 +31,18 @@ public class LoggerContainerImpl implements LoggerContainer {
 
     private List<FinancialTransaction> financialTransactionDB = new ArrayList<>();
 
+    private List<FinancialTransaction> mergedFinancialTransactionTempList = new ArrayList<>();
+
     private BlockingQueue<FinancialTransaction> financialTransactionBQ = new LinkedBlockingQueue<>();
 
     @PostConstruct
-    public void init() {
+    public void drainToArrayJob() {
         Runnable runnable = () -> {
             financialTransactionBQ.drainTo(financialTransactionDB);
+            System.out.println("Financial transaction: " + financialTransactionDB);
             logger.debug("Collection drained!");
+            mergedFinancialTransactionTempList.addAll(TransactionMerger.mergeTransactions(financialTransactionDB));
+            System.out.println("Merged DFTTemp: " + mergedFinancialTransactionTempList);
         };
         executorService.scheduleAtFixedRate(runnable, 0, 5, TimeUnit.SECONDS);
     }
